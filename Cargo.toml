@@ -5,3 +5,9 @@ edition = "2021"
 
 [dependencies]
 
+[[bin]]
+name = "data_structure"
+path = "data_structure"
+
+[workspace]
+members = [ "data_structure/*" ]
