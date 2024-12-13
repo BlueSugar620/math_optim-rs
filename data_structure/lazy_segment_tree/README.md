@@ -68,3 +68,7 @@ $A_i$
 to
 $s \cdot A_i$
 .
+
+It takes
+$O(\log n)$
+time complexity.
