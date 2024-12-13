@@ -5,7 +5,7 @@
 Let
 $(M, \cdot)$
 be a monoid, and
-$A = (A_i)_{i = 0}^{n - 1} \sube M$
+$A = (A_i)_{i = 0}^{n - 1} \subseteq M$
 be a sequence on the monoid.
 
 The following values are calculated at hitgh speed.
