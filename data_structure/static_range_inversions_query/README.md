@@ -15,7 +15,7 @@ $A = (A_i)_{i = 0}^{n - 1}$
 struct static range inversions query.
 
 It takes
-$\langle O(n \sqrt{n}), O(n \sqrt{n}) \eangle$
+$\langle O(n \sqrt{n}), O(n \sqrt{n}) \rangle$
 complexity.
 
 ### calculate inversions
