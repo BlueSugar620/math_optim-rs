@@ -9,5 +9,9 @@ edition = "2021"
 name = "data_structure"
 path = "data_structure"
 
+[[bin]]
+name = "number_theory"
+path = "number_theory"
+
 [workspace]
-members = [ "data_structure/*" ]
+members = [ "data_structure/*", "number_theory/*" ]
