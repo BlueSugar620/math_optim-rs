@@ -21,5 +21,13 @@ path = "sequence"
 name = "graph"
 path = "graph"
 
+[[bin]]
+name = "tree"
+path = "tree"
+
+[[bin]]
+name = "geometry"
+path = "geometry"
+
 [workspace]
-members = [ "data_structure/*", "number_theory/*", "sequence/*", "graph/*" ]
+members = [ "data_structure/*", "number_theory/*", "sequence/*", "graph/*", "tree/*", "geometry/*" ]
