@@ -1,3 +1,6 @@
+pub mod potential_dsu;
+pub mod relational_dsu;
+
 pub mod disjoint_set_union {
     pub struct DisjointSetUnion {
         parents: Box<[isize]>,
