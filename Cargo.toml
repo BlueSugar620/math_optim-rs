@@ -5,29 +5,5 @@ edition = "2021"
 
 [dependencies]
 
-[[bin]]
-name = "data_structure"
-path = "data_structure"
-
-[[bin]]
-name = "number_theory"
-path = "number_theory"
-
-[[bin]]
-name = "sequence"
-path = "sequence"
-
-[[bin]]
-name = "graph"
-path = "graph"
-
-[[bin]]
-name = "tree"
-path = "tree"
-
-[[bin]]
-name = "geometry"
-path = "geometry"
-
 [workspace]
-members = [ "data_structure/*", "number_theory/*", "sequence/*", "graph/*", "tree/*", "geometry/*" ]
+members = [ "data_structure/*" ]
