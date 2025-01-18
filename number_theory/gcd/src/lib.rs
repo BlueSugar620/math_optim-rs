@@ -5,6 +5,14 @@ pub fn gcd(a: u64, b: u64) -> u64 {
     gcd(b, a % b)
 }
 
+pub fn extgcd(a: u64, b: u64) -> (i64, i64, u64) {
+    if b == 0 {
+        return (1, 0, a);
+    }
+    let (x, y, g) = extgcd(b, a % b);
+    (y, x - (a / b) as i64 * y, g)
+}
+
 pub fn lcm(a: u64, b: u64) -> u64 {
     a / gcd(a, b) * b
 }
