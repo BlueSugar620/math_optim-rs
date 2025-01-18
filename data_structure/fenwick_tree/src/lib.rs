@@ -1,122 +1,67 @@
-pub mod fenwick_tree_on_monoid {
-    pub trait CommutativeMonoid {
-        type Monoid: Copy;
-        fn e() -> Self::Monoid;
-        fn op(lhs: &Self::Monoid, rhs: &Self::Monoid) -> Self::Monoid;
-    }
-
-    pub struct FenwickTree<M: CommutativeMonoid> {
-        values: Vec<M::Monoid>,
-    }
-
-    impl<M: CommutativeMonoid> FenwickTree<M> {
-        pub fn new(a: &[M::Monoid]) -> Self {
-            let mut values = vec![M::e(); a.len() + 1];
-            for (i, a) in a.iter().enumerate() {
-                let i = i + 1;
-                values[i] = M::op(&values[i], a);
-                let lsb = i & i.wrapping_neg();
-                if i + lsb < values.len() {
-                    values[i + lsb] = M::op(&values[i + lsb], &values[i]);
-                }
-            }
-            Self { values }
-        }
-
-        pub fn push(&mut self, mut x: M::Monoid) {
-            let n = self.values.len();
-            let lsb = n & n.wrapping_neg();
-            let mut d = 1;
-            while d < lsb {
-                x = M::op(&x, &self.values[n - d]);
-                d *= 2;
-            }
-            self.values.push(x);
-        }
-
-        pub fn op_at(&mut self, mut i: usize, x: M::Monoid) {
-            i += 1;
-            while i < self.values.len() {
-                self.values[i] = M::op(&self.values[i], &x);
-                i += i & i.wrapping_neg();
-            }
-        }
-
-        pub fn prefix_sum(&self, mut end: usize) -> M::Monoid {
-            let mut res = M::e();
-            while end > 0 {
-                res = M::op(&res, &self.values[end]);
-                end -= end & end.wrapping_neg();
-            }
-            res
-        }
-    }
-}
-
-pub mod fenwick_tree_on_abelian {
+pub mod fenwick_tree {
     use std::ops::RangeBounds;
 
     pub trait Abelian {
-        type Group: Copy;
-        fn e() -> Self::Group;
-        fn op(lhs: &Self::Group, rhs: &Self::Group) -> Self::Group;
-        fn inv(val: &Self::Group) -> Self::Group;
+        type Abelian: Clone;
+        fn e() -> Self::Abelian;
+        fn add(lhs: &Self::Abelian, rhs: &Self::Abelian) -> Self::Abelian;
+        fn inv(val: &Self::Abelian) -> Self::Abelian;
     }
 
-    pub struct FenwickTree<G: Abelian> {
-        values: Vec<G::Group>,
+    pub struct FenwickTree<T: Abelian> {
+        values: Vec<T::Abelian>,
     }
 
-    impl<G: Abelian> FenwickTree<G> {
-        pub fn new(a: &[G::Group]) -> Self {
-            let mut values = vec![G::e(); a.len() + 1];
+    impl<T: Abelian> FenwickTree<T> {
+        pub fn new(a: &[T::Abelian]) -> Self {
+            let mut values = vec![T::e(); a.len() + 1];
             for (i, a) in a.iter().enumerate() {
                 let i = i + 1;
-                values[i] = G::op(&values[i], a);
+                values[i] = T::add(&values[i], a);
                 let lsb = i & i.wrapping_neg();
                 if i + lsb < values.len() {
-                    values[i + lsb] = G::op(&values[i + lsb], &values[i]);
+                    values[i + lsb] = T::add(&values[i + lsb], &values[i]);
                 }
             }
             Self { values }
         }
 
-        pub fn push(&mut self, mut x: G::Group) {
+        pub fn push(&mut self, mut x: T::Abelian) {
             let n = self.values.len();
             let lsb = n & n.wrapping_neg();
             let mut d = 1;
             while d < lsb {
-                x = G::op(&x, &self.values[n - d]);
+                x = T::add(&x, &self.values[n - d]);
                 d *= 2;
             }
             self.values.push(x);
         }
 
-        pub fn op_at(&mut self, mut i: usize, x: G::Group) {
+        pub fn add_at(&mut self, mut i: usize, x: T::Abelian) {
             i += 1;
             while i < self.values.len() {
-                self.values[i] = G::op(&self.values[i], &x);
+                self.values[i] = T::add(&self.values[i], &x);
                 i += i & i.wrapping_neg();
             }
         }
 
-        pub fn update_at(&mut self, i: usize, x: G::Group) {
+        pub fn update_at(&mut self, i: usize, x: T::Abelian) {
             let a = self.fold(i..=i);
-            self.op_at(i, G::op(&G::inv(&a), &x));
+            self.add_at(i, T::add(&T::inv(&a), &x));
         }
 
-        pub fn prefix_sum(&self, mut end: usize) -> G::Group {
-            let mut res = G::e();
-            while end > 0 {
-                res = G::op(&res, &self.values[end]);
-                end -= end & end.wrapping_neg();
+        fn _fold(&self, mut r: usize) -> T::Abelian {
+            let mut res = T::e();
+            while r > 0 {
+                res = T::add(&res, &self.values[r]);
+                r -= r & r.wrapping_neg();
             }
             res
         }
 
-        pub fn fold<R: RangeBounds<usize>>(&self, range: R) -> G::Group {
+        pub fn fold<R: RangeBounds<usize>>(&self, range: R) -> T::Abelian {
             let (l, r) = unzip(range, self.values.len() - 1);
-            G::op(&self.prefix_sum(r), &G::inv(&self.prefix_sum(l)))
+            T::add(&self._fold(r), &T::inv(&self._fold(l)))
         }
     }
 
