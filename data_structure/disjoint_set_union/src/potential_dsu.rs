@@ -1,70 +1,68 @@
-pub mod potential_dsu {
-    pub trait Abelian {
-        type Abelian: Clone + PartialEq;
-        fn id() -> Self::Abelian;
-        fn add(lhs: &Self::Abelian, rhs: &Self::Abelian) -> Self::Abelian;
-        fn inv(val: &Self::Abelian) -> Self::Abelian;
+pub trait Group {
+    type Value: Clone + PartialEq;
+    fn id() -> Self::Value;
+    fn mul(lhs: &Self::Value, rhs: &Self::Value) -> Self::Value;
+    fn inv(val: &Self::Value) -> Self::Value;
+}
+
+pub struct PotentialDSU<T: Group> {
+    parents: Vec<isize>,
+    potentials: Vec<T::Value>,
+    cnt: usize,
+}
+
+impl<T: Group> PotentialDSU<T> {
+    pub fn new(n: usize) -> Self {
+        Self {
+            parents: vec![-1; n],
+            potentials: vec![T::id(); n],
+            cnt: n,
+        }
     }
 
-    pub struct PotentialDSU<T: Abelian> {
-        parents: Vec<isize>,
-        potentials: Vec<T::Abelian>,
-        cnt: usize,
+    pub fn root(&self, mut v: usize) -> (usize, T::Value) {
+        let mut potential = self.potentials[v].clone();
+        while self.parents[v] >= 0 {
+            v = self.parents[v] as usize;
+            potential = T::mul(&self.potentials[v], &potential);
+        }
+        (v, potential)
     }
 
-    impl<T: Abelian> PotentialDSU<T> {
-        pub fn new(n: usize) -> Self {
-            Self {
-                parents: vec![-1; n],
-                potentials: vec![T::id(); n],
-                cnt: n,
+    pub fn unite(&mut self, from: usize, to: usize, d: T::Value) -> bool {
+        let (mut from, p_from) = self.root(from);
+        let (mut to, p_to) = self.root(to);
+        if from == to {
+            T::mul(&p_from, &d) == p_to
+        } else {
+            let mut d = T::mul(&T::mul(&p_from, &d), &T::inv(&p_to));
+            if self.parents[from] > self.parents[to] {
+                std::mem::swap(&mut from, &mut to);
+                d = T::inv(&d);
             }
+            self.parents[from] += self.parents[to];
+            self.parents[to] = from as isize;
+            self.potentials[to] = d;
+            self.cnt -= 1;
+            true
         }
+    }
 
-        pub fn root(&self, mut v: usize) -> (usize, T::Abelian) {
-            let mut potential = self.potentials[v].clone();
-            while self.parents[v] >= 0 {
-                v = self.parents[v] as usize;
-                potential = T::add(&potential, &self.potentials[v]);
-            }
-            (v, potential)
+    pub fn poteintial(&self, from: usize, to: usize) -> Option<T::Value> {
+        let (from, p_from) = self.root(from);
+        let (to, p_to) = self.root(to);
+        if from == to {
+            Some(T::mul(&T::inv(&p_from), &p_to))
+        } else {
+            None
         }
+    }
 
-        pub fn unite(&mut self, from: usize, to: usize, d: T::Abelian) -> bool {
-            let (mut from, p_from) = self.root(from);
-            let (mut to, p_to) = self.root(to);
-            if from == to {
-                T::add(&p_to, &T::inv(&p_from)) == d
-            } else {
-                let mut d = T::add(&T::add(&d, &p_from), &T::inv(&p_to));
-                if self.parents[from] > self.parents[to] {
-                    std::mem::swap(&mut from, &mut to);
-                    d = T::inv(&d);
-                }
-                self.parents[from] += self.parents[to];
-                self.parents[to] = from as isize;
-                self.potentials[to] = d;
-                self.cnt -= 1;
-                true
-            }
-        }
+    pub fn size(&self, u: usize) -> usize {
+        -self.parents[self.root(u).0] as usize
+    }
 
-        pub fn poteintial(&self, from: usize, to: usize) -> Option<T::Abelian> {
-            let (from, p_from) = self.root(from);
-            let (to, p_to) = self.root(to);
-            if from == to {
-                Some(T::add(&p_to, &T::inv(&p_from)))
-            } else {
-                None
-            }
-        }
-
-        pub fn size(&self, u: usize) -> usize {
-            -self.parents[self.root(u).0] as usize
-        }
-
-        pub fn cnt(&self) -> usize {
-            self.cnt
-        }
+    pub fn cnt(&self) -> usize {
+        self.cnt
     }
 }
