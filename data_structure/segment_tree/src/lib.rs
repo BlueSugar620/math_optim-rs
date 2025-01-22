@@ -1,4 +1,5 @@
 pub mod dual_segment_tree;
+pub mod lazy_segment_tree;
 
 pub trait Monoid {
     type Value: Copy;

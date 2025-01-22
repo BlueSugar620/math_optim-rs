@@ -36,6 +36,7 @@ impl<T: MonoidAct> DualSegmentTree<T> {
         let (l, r) = unzip(range, n);
         let (mut l, mut r) = (l + n, r + n);
 
+        // 作要素モノイドが可換な場合は必要ない
         for i in (1..=n.trailing_zeros()).rev() {
             if (l >> i) << i != l {
                 self.sink(l >> i);
