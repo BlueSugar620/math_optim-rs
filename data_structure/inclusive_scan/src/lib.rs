@@ -1,3 +1,5 @@
+pub mod inclusive_scan_2d;
+
 use std::ops::{Bound, RangeBounds};
 
 pub trait Group {
