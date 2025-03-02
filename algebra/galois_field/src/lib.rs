@@ -1,4 +1,5 @@
 use std::{
+    fmt::{Debug, Display},
     iter::{Product, Sum},
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
 };
@@ -68,6 +69,16 @@ macro_rules! new_from_unsigned {
     };
 }
 new_from_unsigned!(u8, u16, u32, u64, u128, usize);
+impl<const MOD: u64> Debug for GF<MOD> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
+impl<const MOD: u64> Display for GF<MOD> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
 
 impl<const MOD: u64> Neg for GF<MOD> {
     type Output = Self;
