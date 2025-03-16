@@ -10,6 +10,7 @@ pub trait Monoid {
 use std::ops::RangeBounds;
 pub struct SegmentTree<T: Monoid> {
     values: Vec<T::Value>,
+    len: usize,
 }
 impl<T: Monoid> SegmentTree<T> {
     pub fn new(a: &[T::Value]) -> Self {
@@ -19,7 +20,10 @@ impl<T: Monoid> SegmentTree<T> {
         for i in (1..n).rev() {
             values[i] = T::op(&values[2 * i], &values[2 * i + 1]);
         }
-        Self { values }
+        Self {
+            values,
+            len: a.len(),
+        }
     }
 
     pub fn get_at(&self, idx: usize) -> T::Value {
@@ -54,6 +58,38 @@ impl<T: Monoid> SegmentTree<T> {
             r >>= 1;
         }
         T::op(&left, &right)
+    }
+
+    pub fn max_right<P: Fn(&T::Value) -> bool>(&self, l: usize, f: P) -> usize {
+        let n = self.values.len() / 2;
+        if l == n {
+            return self.len;
+        }
+        let mut l = l + n;
+        let mut r = 2 * n;
+        let mut x = T::e();
+        while l < r {
+            if l & 1 == 1 {
+                let y = T::op(&x, &self.values[l]);
+                if !f(&y) {
+                    while l < n {
+                        l *= 2;
+                        let z = T::op(&x, &self.values[l]);
+                        if f(&z) {
+                            x = z;
+                            l += 1;
+                        }
+                    }
+                    return l - n;
+                } else {
+                    x = y;
+                }
+                l += 1;
+            }
+            l >>= 1;
+            r >>= 1;
+        }
+        self.len
     }
 }
 
