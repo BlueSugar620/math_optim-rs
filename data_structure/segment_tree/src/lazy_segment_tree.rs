@@ -12,6 +12,7 @@ use std::ops::RangeBounds;
 pub struct LazySegmentTree<T: MonoidAct2Monoid> {
     values: Vec<T::Value>,
     maps: Vec<T::Map>,
+    len: usize,
 }
 
 impl<T: MonoidAct2Monoid> LazySegmentTree<T> {
@@ -25,7 +26,17 @@ impl<T: MonoidAct2Monoid> LazySegmentTree<T> {
         Self {
             values,
             maps: vec![T::id(); 2 * n],
+            len: a.len(),
         }
+    }
+
+    pub fn get_at(&mut self, i: usize) -> T::Value {
+        let n = self.values.len() / 2;
+        let i = i + n;
+        for k in (1..=n.trailing_zeros()).rev() {
+            self.sink_map(i >> k);
+        }
+        self.values[i]
     }
 
     pub fn fold(&mut self, range: impl RangeBounds<usize>) -> T::Value {
@@ -56,6 +67,18 @@ impl<T: MonoidAct2Monoid> LazySegmentTree<T> {
             r >>= 1;
         }
         T::op(&left, &right)
+    }
+
+    pub fn update_at(&mut self, i: usize, x: T::Value) {
+        let n = self.values.len() / 2;
+        let i = i + n;
+        for k in (1..=n.trailing_zeros()).rev() {
+            self.sink_map(i >> k);
+        }
+        self.values[i] = x;
+        for k in 1..=n.trailing_zeros() {
+            self.float_value(i >> k);
+        }
     }
 
     pub fn act(&mut self, range: impl RangeBounds<usize>, x: T::Map) {
@@ -94,6 +117,42 @@ impl<T: MonoidAct2Monoid> LazySegmentTree<T> {
                 self.float_value((r - 1) >> i);
             }
         }
+    }
+
+    pub fn max_right<P: Fn(&T::Value) -> bool>(&mut self, l: usize, f: P) -> usize {
+        let n = self.values.len() / 2;
+        if l == n {
+            return self.len;
+        }
+        let mut l = l + n;
+        let mut r = 2 * n;
+        for k in (1..=n.trailing_zeros()).rev() {
+            self.sink_map(l >> k);
+        }
+        let mut x = T::e();
+        while l < r {
+            if l & 1 == 1 {
+                let y = T::op(&x, &self.values[l]);
+                if !f(&y) {
+                    while l < n {
+                        self.sink_map(l);
+                        l *= 2;
+                        let z = T::op(&x, &self.values[l]);
+                        if f(&z) {
+                            x = z;
+                            l += 1;
+                        }
+                    }
+                    return l - n;
+                } else {
+                    x = y;
+                }
+                l += 1;
+            }
+            l >>= 1;
+            r >>= 1;
+        }
+        self.len
     }
 
     fn apply(&mut self, i: usize, x: &T::Map) {
