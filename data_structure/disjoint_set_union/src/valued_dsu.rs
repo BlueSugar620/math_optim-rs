@@ -1,15 +1,20 @@
-pub mod potential_dsu;
-pub mod valued_dsu;
+pub trait Monoid {
+    type Value: Copy;
+    fn e() -> Self::Value;
+    fn op(lhs: &Self::Value, rhs: &Self::Value) -> Self::Value;
+}
 
-pub struct DisjointSetUnion {
+pub struct ValuedDSU<T: Monoid> {
     parents: Vec<isize>,
+    values: Vec<T::Value>,
     cnt: usize,
 }
 
-impl DisjointSetUnion {
+impl<T: Monoid> ValuedDSU<T> {
     pub fn new(n: usize) -> Self {
         Self {
             parents: vec![-1; n],
+            values: vec![T::e(); n],
             cnt: n,
         }
     }
@@ -19,6 +24,15 @@ impl DisjointSetUnion {
             v = self.parents[v] as usize;
         }
         v
+    }
+
+    pub fn value(&self, v: usize) -> T::Value {
+        self.values[self.root(v)]
+    }
+
+    pub fn update_at(&mut self, v: usize, value: T::Value) {
+        let v = self.root(v);
+        self.values[v] = value;
     }
 
     pub fn unite(&mut self, u: usize, v: usize) {
@@ -32,6 +46,8 @@ impl DisjointSetUnion {
         }
         self.parents[u] += self.parents[v];
         self.parents[v] = u as isize;
+        self.values[u] = T::op(&self.values[u], &self.values[v]);
+        self.values[v] = T::e();
         self.cnt -= 1;
     }
 
