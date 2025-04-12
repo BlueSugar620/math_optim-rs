@@ -1,3 +1,5 @@
+pub mod combinatorics;
+
 use std::{
     fmt::{Debug, Display},
     iter::{Product, Sum},
