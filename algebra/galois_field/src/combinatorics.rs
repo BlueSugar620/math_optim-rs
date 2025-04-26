@@ -1,18 +1,20 @@
-pub struct Combinatorics<const MOD: u64> {
+use super::GF;
+
+pub struct Combinatorics<const MOD: u32> {
     factorials: Vec<GF<MOD>>,
     inv_factorials: Vec<GF<MOD>>,
 }
 
-impl<const MOD: u64> Combinatorics<MOD> {
+impl<const MOD: u32> Combinatorics<MOD> {
     pub fn new(n: usize) -> Self {
         let mut factorials = Vec::with_capacity(n);
         factorials.push(GF::<MOD>::new(1));
-        for i in 1..=n as u64 {
+        for i in 1..=n as u32 {
             factorials.push(factorials.last().unwrap() * GF::<MOD>::new(i));
         }
         let mut inv_factorials = Vec::with_capacity(n);
         inv_factorials.push(factorials.last().unwrap().inv());
-        for i in (1..=n as u64).rev() {
+        for i in (1..=n as u32).rev() {
             inv_factorials.push(inv_factorials.last().unwrap() * GF::<MOD>::new(i));
         }
         inv_factorials.reverse();

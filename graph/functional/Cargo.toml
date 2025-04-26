@@ -1,7 +1,6 @@
 [package]
-name = "galois_field"
+name = "functional"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-algebra = { path = "../algebra" }
