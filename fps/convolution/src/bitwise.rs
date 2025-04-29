@@ -1,7 +1,7 @@
 use super::Convolution;
 use galois_field::GF;
 
-const MOD: u64 = 998_244_353;
+const MOD: u32 = 998_244_353;
 
 pub enum Xor {}
 impl BitConv for Xor {
@@ -56,7 +56,7 @@ impl<T: BitConv> Convolution for Bitwise<T> {
             }
         }
 
-        let coef = GF::new(2).inv().pow(b as u64);
+        let coef = GF::new(2).inv().pow(b as u32);
         for a in a.iter_mut() {
             *a *= coef;
         }

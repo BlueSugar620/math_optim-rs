@@ -1,18 +1,18 @@
 pub mod dual_segment_tree;
 pub mod lazy_segment_tree;
 
-pub trait Monoid {
+pub trait SegmentTreeOp {
     type Value: Copy;
     fn e() -> Self::Value;
     fn op(lhs: &Self::Value, rhs: &Self::Value) -> Self::Value;
 }
 
 use std::ops::RangeBounds;
-pub struct SegmentTree<T: Monoid> {
+pub struct SegmentTree<T: SegmentTreeOp> {
     values: Vec<T::Value>,
     len: usize,
 }
-impl<T: Monoid> SegmentTree<T> {
+impl<T: SegmentTreeOp> SegmentTree<T> {
     pub fn new(a: &[T::Value]) -> Self {
         let n = a.len().next_power_of_two();
         let mut values = vec![T::e(); 2 * n];

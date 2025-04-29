@@ -1,17 +1,17 @@
 use std::ops::{Bound, RangeBounds};
 
-pub trait Abelian {
+pub trait InclusiveScan2dOp {
     type Value: Copy;
     fn e() -> Self::Value;
     fn add(lhs: &Self::Value, rhs: &Self::Value) -> Self::Value;
     fn inv(val: &Self::Value) -> Self::Value;
 }
 
-pub struct InclusiveScan2d<T: Abelian> {
+pub struct InclusiveScan2d<T: InclusiveScan2dOp> {
     value: Vec<Vec<T::Value>>,
 }
 
-impl<T: Abelian> InclusiveScan2d<T> {
+impl<T: InclusiveScan2dOp> InclusiveScan2d<T> {
     pub fn new(a: &Vec<Vec<T::Value>>) -> Self {
         let h = a.len();
         let w = a[0].len();

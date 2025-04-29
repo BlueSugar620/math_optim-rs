@@ -2,23 +2,23 @@ pub mod inclusive_scan_2d;
 
 use std::ops::{Bound, RangeBounds};
 
-pub trait Group {
+pub trait InclusiveScanOp {
     type Value: Clone;
-    fn id() -> Self::Value;
+    fn e() -> Self::Value;
     fn mul(lhs: &Self::Value, rhs: &Self::Value) -> Self::Value;
     fn inv(val: &Self::Value) -> Self::Value;
 }
 
-pub struct InclusiveScan<T: Group> {
+pub struct InclusiveScan<T: InclusiveScanOp> {
     scan: Vec<T::Value>,
 }
 
-impl<T: Group> InclusiveScan<T> {
+impl<T: InclusiveScanOp> InclusiveScan<T> {
     pub fn new(a: &[T::Value]) -> Self {
         Self {
-            scan: std::iter::once(T::id())
+            scan: std::iter::once(T::e())
                 .chain(a.to_vec())
-                .scan(T::id(), |acc, a| {
+                .scan(T::e(), |acc, a| {
                     *acc = T::mul(acc, &a);
                     Some(acc.clone())
                 })

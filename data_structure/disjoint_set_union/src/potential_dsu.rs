@@ -1,21 +1,21 @@
-pub trait Group {
+pub trait PotentialDSUOp {
     type Value: Clone + PartialEq;
-    fn id() -> Self::Value;
+    fn e() -> Self::Value;
     fn mul(lhs: &Self::Value, rhs: &Self::Value) -> Self::Value;
     fn inv(val: &Self::Value) -> Self::Value;
 }
 
-pub struct PotentialDSU<T: Group> {
-    parents: Vec<isize>,
+pub struct PotentialDSU<T: PotentialDSUOp> {
+    parents: Vec<i32>,
     potentials: Vec<T::Value>,
     cnt: usize,
 }
 
-impl<T: Group> PotentialDSU<T> {
+impl<T: PotentialDSUOp> PotentialDSU<T> {
     pub fn new(n: usize) -> Self {
         Self {
             parents: vec![-1; n],
-            potentials: vec![T::id(); n],
+            potentials: vec![T::e(); n],
             cnt: n,
         }
     }
@@ -41,7 +41,7 @@ impl<T: Group> PotentialDSU<T> {
                 d = T::inv(&d);
             }
             self.parents[from] += self.parents[to];
-            self.parents[to] = from as isize;
+            self.parents[to] = from as i32;
             self.potentials[to] = d;
             self.cnt -= 1;
             true

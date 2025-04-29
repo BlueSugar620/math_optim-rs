@@ -1,4 +1,4 @@
-pub trait MonoidAct2Monoid {
+pub trait LazySegmentTreeOp {
     type Value: Copy;
     type Map: Copy;
     fn e() -> Self::Value;
@@ -9,13 +9,13 @@ pub trait MonoidAct2Monoid {
 }
 
 use std::ops::RangeBounds;
-pub struct LazySegmentTree<T: MonoidAct2Monoid> {
+pub struct LazySegmentTree<T: LazySegmentTreeOp> {
     values: Vec<T::Value>,
     maps: Vec<T::Map>,
     len: usize,
 }
 
-impl<T: MonoidAct2Monoid> LazySegmentTree<T> {
+impl<T: LazySegmentTreeOp> LazySegmentTree<T> {
     pub fn new(a: &[T::Value]) -> Self {
         let n = a.len().next_power_of_two();
         let mut values = vec![T::e(); 2 * n];

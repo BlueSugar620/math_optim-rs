@@ -1,5 +1,3 @@
-use proconio::input;
-
 pub fn compress<T: Copy + PartialOrd>(a: &[T]) -> Vec<usize> {
     let mut val = a.to_vec();
     val.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());

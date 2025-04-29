@@ -2,7 +2,7 @@ pub mod potential_dsu;
 pub mod valued_dsu;
 
 pub struct DisjointSetUnion {
-    parents: Vec<isize>,
+    parents: Vec<i32>,
     cnt: usize,
 }
 
@@ -31,7 +31,7 @@ impl DisjointSetUnion {
             std::mem::swap(&mut u, &mut v);
         }
         self.parents[u] += self.parents[v];
-        self.parents[v] = u as isize;
+        self.parents[v] = u as i32;
         self.cnt -= 1;
     }
 

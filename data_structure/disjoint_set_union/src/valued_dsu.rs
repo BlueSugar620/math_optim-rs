@@ -1,16 +1,16 @@
-pub trait Monoid {
+pub trait ValuedDSUOp {
     type Value: Copy;
     fn e() -> Self::Value;
     fn op(lhs: &Self::Value, rhs: &Self::Value) -> Self::Value;
 }
 
-pub struct ValuedDSU<T: Monoid> {
+pub struct ValuedDSU<T: ValuedDSUOp> {
     parents: Vec<isize>,
     values: Vec<T::Value>,
     cnt: usize,
 }
 
-impl<T: Monoid> ValuedDSU<T> {
+impl<T: ValuedDSUOp> ValuedDSU<T> {
     pub fn new(n: usize) -> Self {
         Self {
             parents: vec![-1; n],

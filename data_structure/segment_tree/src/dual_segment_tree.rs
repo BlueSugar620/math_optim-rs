@@ -1,4 +1,4 @@
-pub trait MonoidAct {
+pub trait DualSegmentTreeOp {
     type Value: Copy;
     type Map;
     fn is_commutative() -> bool;
@@ -8,12 +8,12 @@ pub trait MonoidAct {
 }
 
 use std::ops::RangeBounds;
-pub struct DualSegmentTree<T: MonoidAct> {
+pub struct DualSegmentTree<T: DualSegmentTreeOp> {
     values: Vec<T::Value>,
     maps: Vec<T::Map>,
 }
 
-impl<T: MonoidAct> DualSegmentTree<T> {
+impl<T: DualSegmentTreeOp> DualSegmentTree<T> {
     pub fn new(values: &[T::Value]) -> Self {
         let n = values.len().next_power_of_two();
         Self {
